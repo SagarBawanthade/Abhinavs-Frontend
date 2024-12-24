@@ -10,7 +10,6 @@ import axios from "axios";
 const UserProfile = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
-  
 
   const logout = () => {
     toast.error("Logged out successfully");
@@ -19,13 +18,12 @@ const UserProfile = () => {
     navigate("/login");
   };
 
- 
-
   const fetchUser = async (userId: string) => {
     try {
-      const response = await axios.get(`https://abhinasv-s-backend.onrender.com/api/auth/getuser/${userId}`);
-      setUser(response.data);
-       // Update state with fetched user data
+      const response = await axios.get(
+        `https://abhinasv-s-backend.onrender.com/api/auth/getuser/${userId}`
+      );
+      setUser(response.data); // Update state with fetched user data
     } catch (error) {
       toast.error("Error fetching user data");
       navigate("/login");
@@ -43,7 +41,10 @@ const UserProfile = () => {
     const userId = JSON.parse(localStorage.getItem("user") || "{}").id;
     if (userId) {
       try {
-        await axios.put(`https://abhinasv-s-backend.onrender.com/api/auth/updateuser/${userId}`, data);
+        await axios.put(
+          `https://abhinasv-s-backend.onrender.com/api/auth/updateuser/${userId}`,
+          data
+        );
         toast.success("User updated successfully");
         setUser((prevUser) => ({ ...prevUser, ...data } as User)); // Update local state
       } catch (e) {
@@ -128,6 +129,15 @@ const UserProfile = () => {
         >
           Order History
         </Link>
+        {/* Conditional Admin Button */}
+        {user?.role === "admin" && (
+          <Link
+            to="/admin"
+            className="bg-secondaryBrown text-white text-center text-xl py-3 px-5 rounded-md font-medium tracking-wider hover:bg-brown"
+          >
+            Admin Dashboard
+          </Link>
+        )}
         <Button onClick={logout} text="Logout" mode="white" />
       </form>
     </div>

@@ -17,3 +17,5 @@ export { default as ManageUsers } from "./ManageUsers";
 export { default as ManageOrders } from "./ManageOrders";
 export { default as ManageProducts } from "./ManageProducts";
 export { default as ResetPassword } from "./ResetPassword";
+export { default as OrderFailed } from "./OrderFailed";
+export { default as Contact } from "./Contact";

@@ -1,5 +1,6 @@
 import { FaInstagram, FaEnvelope, FaPhoneAlt, FaMapMarkerAlt } from "react-icons/fa";
 import Image from "../assets/brand logo.jpg"; 
+import { Link } from "react-router-dom";
 
 
 const Footer = () => {
@@ -36,9 +37,9 @@ const Footer = () => {
             {/* Policies Section */}
             <div className="flex flex-col gap-4">
               <h3 className="text-xl font-bold ">Policies</h3>
-              <a href="/privacy-policy" className=" text-black text-sm hover:underline">Privacy Policy</a>
-              <a href="/terms-and-conditions" className="text-black text-sm hover:underline">Terms & Conditions</a>
-              <a href="/cancellation-refund-policy" className=" text-black text-sm hover:underline">Cancellation/Refund Policies</a>
+              <Link to="/contact" className=" text-black text-sm hover:underline">Privacy Policy</Link>
+              <Link to="/contact"className="text-black text-sm hover:underline">Terms & Conditions</Link>
+              <Link to="/contact" className=" text-black text-sm hover:underline">Cancellation/Refund Policies</Link>
             </div>
           </div>
 
@@ -51,11 +52,12 @@ const Footer = () => {
               <h3 className="text-xl font-bold">We’re Here to Help!</h3>
               <div className="flex items-center gap-2">
                 <FaEnvelope className="text-black" />
-                <p className="text-sm text-black">pritidasgupta1234@gmail.com</p>
+                <p className="text-sm text-black">abhinavsofficial033@gmail.com</p>
               </div>
               <div className="flex items-center gap-2">
                 <FaPhoneAlt className="text-black" />
                 <p className="text-sm text-black">+91 8828458883</p>
+                <p className="text-sm text-black">+91 7620397865</p>
               </div>
               <div className="flex items-center gap-2">
                 <FaMapMarkerAlt className="text-black" />
@@ -74,7 +76,7 @@ const Footer = () => {
                 <FaInstagram size={20} />
               </a>
               <a
-                href="mailto:pritidasgupta1234@gmail.com"
+                href="mailto:abhinavsofficial033@gmail.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-white text-[rgb(0,0,0)] rounded-full p-2 hover:bg-gray-200"
@@ -99,13 +101,10 @@ const Footer = () => {
             />
 
             {/* Copyright Text */}
-            <p className="text-l">All rights reserved ©2024</p>
+            <p className="text-l">All rights reserved ©2024 Abhinav's</p>
 
 
-             {/* License Credit */}
-             <p className="text-sm text-black text-center">
-              This software is licensed under the <a href="https://opensource.org/licenses/MIT" className="hover:underline">MIT License</a>. Copyright © 2024 Aleksandar Kuzmanović.
-            </p>
+             
           </div>
         </footer>
       </div>

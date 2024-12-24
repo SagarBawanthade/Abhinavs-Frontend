@@ -46,6 +46,13 @@ const Sidebar = ({ isVisible, toggleSidebar }) => {
         >
           Manage Orders
         </Link>
+
+        <Link
+          to="/"
+          className="text-red-300 hover:text-red p-2 rounded-lg"
+        >
+          Sign Out
+        </Link>
       </nav>
     </div>
   );

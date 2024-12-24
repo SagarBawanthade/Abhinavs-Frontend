@@ -192,16 +192,16 @@ const Cart = () => {
               </div>
               <div className="flex items-center justify-between border-t border-gray-200 pt-4">
                 <dt className="text-sm text-gray-600">Shipping estimate</dt>
-                <dd className="text-sm font-medium text-gray-900">₹60</dd>
+                <dd className="text-sm font-medium text-gray-900">₹0</dd>
               </div>
               <div className="flex items-center justify-between border-t border-gray-200 pt-4">
                 <dt className="text-sm text-gray-600">Tax estimate</dt>
-                <dd className="text-sm font-medium text-gray-900">₹{subtotal / 5}</dd>
+                <dd className="text-sm font-medium text-gray-900">₹{1}</dd>
               </div>
               <div className="flex items-center justify-between border-t border-gray-200 pt-4">
                 <dt className="text-base font-medium text-gray-900">Order total</dt>
                 <dd className="text-base font-medium text-gray-900">
-                  ₹{subtotal + 60 + subtotal / 5}
+                  ₹{subtotal + 0 + subtotal / 5}
                 </dd>
               </div>
             </dl>

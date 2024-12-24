@@ -23,6 +23,8 @@ import {
   ManageUsers,
   ManageOrders,
   ResetPassword,
+  OrderFailed,
+  Contact,
 } from "./pages";
 
 import { checkoutAction, searchAction } from "./actions/index";
@@ -97,6 +99,10 @@ const router = createBrowserRouter([
         element: <Register />,
       },
       {
+        path: "contact",
+        element: <Contact />,
+      },
+      {
         path: "order-confirmation",
         element: <OrderConfirmation />,
       },
@@ -107,6 +113,11 @@ const router = createBrowserRouter([
       {
         path: "order-history",
         element: <OrderHistory />,
+        loader: orderHistoryLoader,
+      },
+      {
+        path: "order-failed",
+        element: <OrderFailed />,
         loader: orderHistoryLoader,
       },
       // {

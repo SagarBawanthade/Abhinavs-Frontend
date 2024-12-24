@@ -16,6 +16,7 @@ const SidebarMenu = ({
   const dispatch = useAppDispatch();
   const { loginStatus } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
+  const [autoCloseTimeout, setAutoCloseTimeout] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     // On component mount, initialize login status from localStorage
@@ -32,11 +33,31 @@ const SidebarMenu = ({
   useEffect(() => {
     if (isSidebarOpen) {
       setIsAnimating(true);
+      // Start the auto-close timer
+      const timer = setTimeout(() => {
+        setIsSidebarOpen(false);
+      }, 1000); // Sidebar will auto-close after 5 seconds of inactivity
+      setAutoCloseTimeout(timer);
     } else {
-      const timer = setTimeout(() => setIsAnimating(false), 300);
+      // Clear the timeout if sidebar is closed manually
+      if (autoCloseTimeout) {
+        clearTimeout(autoCloseTimeout);
+      }
+      const timer = setTimeout(() => setIsAnimating(false), 100);
       return () => clearTimeout(timer);
     }
-  }, [isSidebarOpen]);
+  }, [isSidebarOpen, setIsSidebarOpen]);
+
+  const handleInteraction = () => {
+    // Reset the auto-close timer on any interaction
+    if (autoCloseTimeout) {
+      clearTimeout(autoCloseTimeout);
+    }
+    const timer = setTimeout(() => {
+      setIsSidebarOpen(false);
+    }, 1000);
+    setAutoCloseTimeout(timer);
+  };
 
   return (
     <>
@@ -47,6 +68,8 @@ const SidebarMenu = ({
               ? "fixed top-0 left-0 w-64 z-50 h-full transition-transform duration-300 ease-in-out bg-white shadow-lg transform border-r border-black translate-x-0"
               : "fixed top-0 left-0 w-64 z-50 h-full transition-transform duration-300 ease-in-out bg-white shadow-lg transform border-r border-black -translate-x-full"
           }
+          onMouseMove={handleInteraction} // Reset timer on mouse movement
+          onClick={handleInteraction} // Reset timer on any click
         >
           <div className="flex justify-end mr-1 mt-1">
             <HiXMark
@@ -58,6 +81,7 @@ const SidebarMenu = ({
             <Link
               to="/"
               className="text-4xl font-light tracking-[1.08px] max-sm:text-3xl max-[400px]:text-2xl"
+              onClick={handleInteraction}
             >
               Abhinav's
             </Link>
@@ -66,25 +90,31 @@ const SidebarMenu = ({
             <Link
               to="/"
               className="py-2 border-y border-secondaryBrown w-full block flex justify-center"
+              onClick={handleInteraction}
             >
               Home
             </Link>
             <Link
               to="/shop"
               className="py-2 border-y border-secondaryBrown w-full block flex justify-center"
+              onClick={handleInteraction}
             >
               Shop
             </Link>
             <Link
               to="/search"
               className="py-2 border-y border-secondaryBrown w-full block flex justify-center"
+              onClick={handleInteraction}
             >
               Search
             </Link>
             {loginStatus ? (
               <>
                 <button
-                  onClick={logout}
+                  onClick={() => {
+                    handleInteraction();
+                    logout();
+                  }}
                   className="py-2 border-y border-secondaryBrown w-full block flex justify-center"
                 >
                   Logout
@@ -95,12 +125,14 @@ const SidebarMenu = ({
                 <Link
                   to="/login"
                   className="py-2 border-y border-secondaryBrown w-full block flex justify-center"
+                  onClick={handleInteraction}
                 >
                   Sign in
                 </Link>
                 <Link
                   to="/register"
                   className="py-2 border-y border-secondaryBrown w-full block flex justify-center"
+                  onClick={handleInteraction}
                 >
                   Sign up
                 </Link>
@@ -109,6 +141,7 @@ const SidebarMenu = ({
             <Link
               to="/cart"
               className="py-2 border-y border-secondaryBrown w-full block flex justify-center"
+              onClick={handleInteraction}
             >
               Cart
             </Link>

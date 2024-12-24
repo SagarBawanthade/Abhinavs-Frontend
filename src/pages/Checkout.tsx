@@ -7,10 +7,25 @@ import { checkCheckoutFormData } from "../utils/checkCheckoutFormData";
 import { useEffect } from "react";
 import { setCartData } from "../features/cart/cartSlice"; // Ensure this is correct
 
+
 const paymentMethods = [
  
   { id: "razorpay", title: "RazorPay" },
 ];
+
+const loadRazorpayScript = () => {
+  return new Promise((resolve) => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
+
+const razorpayKeyId = import.meta.env.RAZORPAY_KEY_ID;
+console.log(razorpayKeyId);
+
 
 const Checkout = () => {
   const { productsInCart = [], subtotal,userId  } = useAppSelector((state) => state.cart);
@@ -19,30 +34,27 @@ const Checkout = () => {
   const navigate = useNavigate();
   const { user } = useAppSelector((state) => state.auth);  // Make sure you're selecting the user correctly
   const currentUserId = user?.id || userId;
-
   const handleCheckoutSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData);
-
-
-    
+  
     const checkoutData = {
       data,
       products: productsInCart,
-      subtotal: subtotal,
+      subtotal,
     };
-
+  
     // Validate the checkout data
     if (!checkCheckoutFormData(checkoutData)) return;
-
+  
     const paymentMethod = data.paymentType;
-
+  
     // Prepare the order data for the backend
     const orderData = {
       user: {
         email: data.emailAddress,
-        id: currentUserId, // Assuming user ID is stored in localStorage
+        id: currentUserId,
       },
       contactInformation: {
         email: data.emailAddress,
@@ -71,25 +83,94 @@ const Checkout = () => {
           quantity: product?.quantity,
           size: product?.size,
         })),
-        subtotal: subtotal,
+        subtotal,
         shipping: 5,
         taxes: (subtotal * 0.05).toFixed(2),
-        total: (subtotal + 5 + (subtotal * 0.05)).toFixed(2),
+        total: (subtotal + 5 + subtotal * 0.05).toFixed(2),
       },
     };
-  console.log(" Before cretaing order:", orderData);
-    // Send the order data to the backend API
+  
     try {
-      const response = await axios.post("https://abhinasv-s-backend.onrender.com/api/order/create-order", orderData);
-      if (response.status === 201) {
-        toast.success("Order has been placed successfully");
-        navigate("/order-confirmation");
+      // Step 1: Create Razorpay order on the backend
+      const razorpayOrder = await axios.post(
+        "https://abhinasv-s-backend.onrender.com/api/order/create-razorpay-order",
+        { amount: (subtotal + 5 + subtotal * 0.05) * 100 } // Convert to paise
+      );
+  
+      const { orderId } = razorpayOrder.data;
+      if (!orderId) throw new Error("Failed to create Razorpay order");
+  
+      // Step 2: Load Razorpay SDK script
+      const isScriptLoaded = await loadRazorpayScript();
+      if (!isScriptLoaded) {
+        toast.error("Failed to load Razorpay SDK.");
+        return;
       }
+  
+      const options = {
+        key: razorpayKeyId,
+        amount: (subtotal + 1 + subtotal * 0.05) ,
+        currency: "INR",
+        name: "Abhinav's - Best of World",
+        description: "Payment for your order",
+        image: "https://abhinavs-storage-09.s3.ap-south-1.amazonaws.com/products/IMG_0823.JPG", 
+        order_id: orderId,
+        
+        handler: async (response) => {
+          
+          try {
+            // Step 4: Verify payment
+            const verifyPayment = await axios.post(
+              "https://abhinasv-s-backend.onrender.com/api/order/verify-razorpay-payment",
+              response
+            );
+            console.log("Verify Payment:", verifyPayment);
+            console.log("Verify Payment:", response);
+  
+            if (verifyPayment.status === 200) {
+              const finalizedOrderData = {
+                ...orderData,
+                paymentInformation: { method: "Razorpay", ...response },
+              };
+  
+              await axios.post("https://abhinasv-s-backend.onrender.com/api/order/create-order", finalizedOrderData);
+  
+              toast.success("Order placed successfully!");
+              navigate("/order-confirmation");
+            } else {
+              throw new Error("Payment verification failed");
+            }
+          } catch (error) {
+            console.error("Error during payment verification:", error);
+            toast.error("Payment verification failed. Please try again.");
+            navigate("/order-failed");
+          }
+        },
+        prefill: {
+          name: `${data.firstName} ${data.lastName}`,
+          email: data.emailAddress,
+          contact: data.phone,
+        },
+        theme: {
+          color: "#3399cc",
+        },
+      };
+  
+      // Step 6: Open Razorpay checkout
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+  
+      razorpay.on("payment.failed", (response) => {
+        console.error("Payment failed:", response);
+        toast.error("Payment failed. Please try again.");
+        navigate("/order-failed");
+      });
     } catch (error) {
-      toast.error("Failed to create the order. Please try again.");
-      console.error(error);
+      console.error("Error during checkout:", error);
+      toast.error("Failed to initiate payment. Please try again.");
     }
   };
+  
 
   // Fetch cart data from backend API
   useEffect(() => {
@@ -471,19 +552,19 @@ const Checkout = () => {
                 <div className="flex items-center justify-between">
                   <dt className="text-sm">Shipping</dt>
                   <dd className="text-sm font-medium text-gray-900">
-                    ₹{subtotal ? 5 : 0}
+                    ₹{subtotal ? 1 : 0}
                   </dd>
                 </div>
                 <div className="flex items-center justify-between">
                   <dt className="text-sm">Taxes</dt>
                   <dd className="text-sm font-medium text-gray-900">
-                    ₹{subtotal ? subtotal / 5 : 0}
+                    ₹{subtotal ? subtotal / 1 : 0}
                   </dd>
                 </div>
                 <div className="flex items-center justify-between border-t border-gray-200 pt-6">
                   <dt className="text-base font-medium">Total</dt>
                   <dd className="text-base font-medium text-gray-900">
-                    ₹{subtotal ? subtotal + 5 + subtotal / 5 : 0}
+                    ₹{subtotal ? subtotal + 1 + subtotal / 5 : 0}
                   </dd>
                 </div>
               </dl>
