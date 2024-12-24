@@ -100,6 +100,12 @@ const Footer = () => {
 
             {/* Copyright Text */}
             <p className="text-l">All rights reserved ©2024</p>
+
+
+             {/* License Credit */}
+             <p className="text-sm text-black text-center">
+              This software is licensed under the <a href="https://opensource.org/licenses/MIT" className="hover:underline">MIT License</a>. Copyright © 2024 Aleksandar Kuzmanović.
+            </p>
           </div>
         </footer>
       </div>
