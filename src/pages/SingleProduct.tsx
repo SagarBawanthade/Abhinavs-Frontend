@@ -56,7 +56,14 @@ const SingleProduct = () => {
   }, [params.id]);
 
   const handleAddToCart = async () => {
+
+    if (!user) {
+      // If the user is not logged in, show a toast message
+      toast.error("Please log in first to add products to your cart");
+      return;
+    }
     if (singleProduct) {
+
       // Ensure productsInCart is always an array
       const isProductInCart = Array.isArray(productsInCart) && productsInCart.some(
         (item) => item.id === singleProduct._id && item.size === size && item.color === color

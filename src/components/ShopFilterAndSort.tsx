@@ -22,7 +22,7 @@ const ShopFilterAndSort = ({
             value={sortCriteria}
           >
             <option value="default">Default</option>
-            <option value="popularity">Popularity</option>
+           
             <option value="price-asc">Price: low to high</option>
             <option value="price-desc">Price: high to low</option>
           </select>

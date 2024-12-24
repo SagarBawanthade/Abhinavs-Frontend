@@ -1,11 +1,10 @@
-import { useState } from "react";
 import {
-  Button,
   ProductGrid,
   ProductGridWrapper,
   ShowingSearchPagination,
 } from "../components";
-import { Form, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import { useState } from "react";
 
 const Search = () => {
   const [searchParams] = useSearchParams();
@@ -14,28 +13,33 @@ const Search = () => {
   );
 
   return (
-    <div className="max-w-screen-2xl mx-auto">
-      <Form
-        method="post"
-        className="flex items-center mt-24 px-5 max-[400px]:px-3"
-      >
-        <input
-          type="text"
-          placeholder="Search products"
-          className="border border-gray-300 focus:border-gray-400 h-12 text-xl px-3 w-full outline-none max-sm:text-lg"
-          name="searchInput"
+    <div className="max-w-screen-2xl mx-auto px-5 sm:px-10">
+      {/* Header Section */}
+      <div className="text-center mt-16">
+        <h1 className="text-4xl font-bold text-[rgb(111,76,46)] mb-2">
+          Explore Our Products
+        </h1>
+        <p className="text-gray-600 text-lg sm:text-xl">
+          Browse through our collection and find what you love!
+        </p>
+      </div>
+
+      {/* Product Grid */}
+      <div className="mt-12">
+        <ProductGridWrapper searchQuery={searchParams.get("query")!} page={currentPage}>
+          <ProductGrid />
+        </ProductGridWrapper>
+      </div>
+
+      {/* Pagination */}
+      <div className="mt-8">
+        <ShowingSearchPagination
+          page={currentPage}
+          setCurrentPage={setCurrentPage}
         />
-        <div className="w-52 max-sm:w-40">
-          <Button mode="brown" text="Search" type="submit" />
-        </div>
-      </Form>
-
-      <ProductGridWrapper searchQuery={searchParams.get("query")!} page={currentPage}>
-        <ProductGrid />
-      </ProductGridWrapper>
-
-      <ShowingSearchPagination page={currentPage} setCurrentPage={setCurrentPage} />
+      </div>
     </div>
   );
 };
+
 export default Search;
