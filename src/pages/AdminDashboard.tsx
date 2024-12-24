@@ -48,9 +48,9 @@ const AdminDashboard = () => {
     const fetchDashboardData = async () => {
       try {
         const [usersResponse, productsResponse, ordersResponse] = await Promise.all([
-          fetch("http://localhost:5000/api/auth/getusers/"),
-          fetch("http://localhost:5000/api/product/getproducts"),
-          fetch("http://localhost:5000/api/order/orders"),
+          fetch("https://abhinasv-s-backend.onrender.com/api/auth/getusers/"),
+          fetch("https://abhinasv-s-backend.onrender.com/api/product/getproducts"),
+          fetch("https://abhinasv-s-backend.onrender.com/api/order/orders"),
         ]);
 
         const usersData = await usersResponse.json();

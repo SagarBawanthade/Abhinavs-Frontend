@@ -25,7 +25,7 @@ const Login = () => {
 
     try {
       // Send login data to the backend
-      const response = await axios.post("http://localhost:5000/api/auth/login", {
+      const response = await axios.post("https://abhinasv-s-backend.onrender.com/api/auth/login", {
         email: data.email,
         password: data.password,
       });

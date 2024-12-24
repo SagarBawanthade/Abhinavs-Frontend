@@ -12,7 +12,7 @@ const ManageProducts = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/product/getproducts");
+        const response = await axios.get("https://abhinasv-s-backend.onrender.com/api/product/getproducts");
         setProducts(response.data);
       } catch (error) {
         console.log("Error fetching products:", error.message);
@@ -38,7 +38,7 @@ const ManageProducts = () => {
     if (!productToDelete) return;
 
     try {
-      await axios.delete(`http://localhost:5000/api/product/deleteproduct/${productToDelete}`);
+      await axios.delete(`https://abhinasv-s-backend.onrender.com/api/product/deleteproduct/${productToDelete}`);
       setProducts(products.filter((product) => product._id !== productToDelete));
       toast.success("Product deleted successfully!");
     } catch (error) {

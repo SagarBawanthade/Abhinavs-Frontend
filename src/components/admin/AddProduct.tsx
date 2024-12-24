@@ -48,7 +48,7 @@ const AddProduct = () => {
 
       // Send multiple files to backend for uploading to S3
       const response = await axios.post(
-        "http://localhost:5000/api/product/image-upload",
+        "https://abhinasv-s-backend.onrender.com/api/product/image-upload",
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
@@ -85,7 +85,7 @@ const AddProduct = () => {
     try {
       // Send the form data to backend
       const response = await axios.post(
-        "http://localhost:5000/api/product/addproduct",
+        "https://abhinasv-s-backend.onrender.com/api/product/addproduct",
         formData
       );
 

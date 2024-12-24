@@ -23,7 +23,7 @@ const UserProfile = () => {
 
   const fetchUser = async (userId: string) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/auth/getuser/${userId}`);
+      const response = await axios.get(`https://abhinasv-s-backend.onrender.com/api/auth/getuser/${userId}`);
       setUser(response.data);
        // Update state with fetched user data
     } catch (error) {
@@ -43,7 +43,7 @@ const UserProfile = () => {
     const userId = JSON.parse(localStorage.getItem("user") || "{}").id;
     if (userId) {
       try {
-        await axios.put(`http://localhost:5000/api/auth/updateuser/${userId}`, data);
+        await axios.put(`https://abhinasv-s-backend.onrender.com/api/auth/updateuser/${userId}`, data);
         toast.success("User updated successfully");
         setUser((prevUser) => ({ ...prevUser, ...data } as User)); // Update local state
       } catch (e) {

@@ -80,7 +80,7 @@ const Checkout = () => {
   console.log(" Before cretaing order:", orderData);
     // Send the order data to the backend API
     try {
-      const response = await axios.post("http://localhost:5000/api/order/create-order", orderData);
+      const response = await axios.post("https://abhinasv-s-backend.onrender.com/api/order/create-order", orderData);
       if (response.status === 201) {
         toast.success("Order has been placed successfully");
         navigate("/order-confirmation");
@@ -96,7 +96,7 @@ const Checkout = () => {
     if (currentUserId) {
       const fetchCartData = async () => {
         try {
-          const response = await fetch(`http://localhost:5000/api/cart/cart/${currentUserId}`);
+          const response = await fetch(`https://abhinasv-s-backend.onrender.com/api/cart/cart/${currentUserId}`);
           if (response.ok) {
             const data = await response.json();
             

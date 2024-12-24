@@ -21,7 +21,7 @@ const Cart = () => {
     if (currentUserId) {
       const fetchCartData = async () => {
         try {
-          const response = await fetch(`http://localhost:5000/api/cart/cart/${currentUserId}`);
+          const response = await fetch(`https://abhinasv-s-backend.onrender.com/api/cart/cart/${currentUserId}`);
           if (response.ok) {
             const data = await response.json();
             // Dispatch only the necessary parts of the data
@@ -56,7 +56,7 @@ const Cart = () => {
     localStorage.setItem(`cart_${currentUserId}`, JSON.stringify({ productsInCart: updatedCart, subtotal }));
 
     try {
-      const response = await fetch("http://localhost:5000/api/cart/cart/remove-item", {
+      const response = await fetch("https://abhinasv-s-backend.onrender.com/api/cart/cart/remove-item", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: currentUserId, productId: productId }),
@@ -80,7 +80,7 @@ const Cart = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/cart/cart/update-item", {
+      const response = await fetch("https://abhinasv-s-backend.onrender.com/api/cart/cart/update-item", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: currentUserId, productId: productId, quantity: newQuantity }),

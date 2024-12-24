@@ -16,7 +16,7 @@ const ProductGridWrapper = ({
 
   const getProducts = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/product/getproducts");
+      const response = await fetch("https://abhinasv-s-backend.onrender.com/api/product/getproducts");
       const allProducts = await response.json();
      
       let filteredProducts = allProducts;

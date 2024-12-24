@@ -6,7 +6,7 @@ import { FaCircle, FaCheckCircle, FaTruck } from "react-icons/fa"; // Import the
 
 export const loader = async () => {
   try {
-    const response = await fetch("http://localhost:5000/api/order/orders");
+    const response = await fetch("https://abhinasv-s-backend.onrender.com/api/order/orders");
     if (!response.ok) {
       throw new Error(`Failed to fetch orders: ${response.statusText}`);
     }

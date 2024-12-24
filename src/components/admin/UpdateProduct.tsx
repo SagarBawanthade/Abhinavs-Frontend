@@ -28,7 +28,7 @@ const EditProduct = () => {
     const fetchProductDetails = async () => {
       try {
     console.log("Edit product clicked for", productId);
-        const response = await axios.get(`http://localhost:5000/api/product/getproduct/${productId}`);
+        const response = await axios.get(`https://abhinasv-s-backend.onrender.com/api/product/getproduct/${productId}`);
         setFormData(response.data);
       } catch (err) {
         toast.error("Failed to fetch product details");
@@ -60,7 +60,7 @@ const EditProduct = () => {
       const formData = new FormData();
       Array.from(files).forEach((file) => formData.append("images", file));
 
-      const response = await axios.post("http://localhost:5000/api/product/image-upload", formData, {
+      const response = await axios.post("https://abhinasv-s-backend.onrender.com/api/product/image-upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -93,7 +93,7 @@ const EditProduct = () => {
 
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/product/updateproduct/${productId}`,
+        `https://abhinasv-s-backend.onrender.com/api/product/updateproduct/${productId}`,
         formData
       );
 

@@ -9,7 +9,7 @@ const ManageProducts = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/auth/getusers");
+        const response = await fetch("https://abhinasv-s-backend.onrender.com/api/auth/getusers");
         const data = await response.json();
         if (Array.isArray(data)) {
           setUsers(data);
@@ -29,7 +29,7 @@ const ManageProducts = () => {
   // Delete user
   const deleteUser = async (id) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/auth/deleteuser/${id}`, {
+      const response = await fetch(`https://abhinasv-s-backend.onrender.com/api/auth/deleteuser/${id}`, {
         method: 'DELETE',
       });
 

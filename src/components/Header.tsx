@@ -19,12 +19,12 @@ const Header = () => {
     if (loginStatus && user?.id) {
       const fetchUserData = async () => {
         try {
-          const response = await axios.get(`http://localhost:5000/api/auth/getuser/${user.id}`);
+          const response = await axios.get(`https://abhinasv-s-backend.onrender.com/api/auth/getuser/${user.id}`);
           dispatch(setUserData({ firstName: response.data.firstName }));
 
           const fetchCartData = async () => {
             try {
-              const cartResponse = await axios.get(`http://localhost:5000/api/cart/cart/${user.id}`);
+              const cartResponse = await axios.get(`https://abhinasv-s-backend.onrender.com/api/cart/cart/${user.id}`);
               const cartItems = cartResponse.data.cart.items || [];
               const uniqueProducts = new Set(cartItems.map((item) => item.product));
               const uniqueItemCount = uniqueProducts.size;

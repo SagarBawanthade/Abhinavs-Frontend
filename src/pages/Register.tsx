@@ -27,7 +27,7 @@ const Register = () => {
 
     try {
       // Send registration data to the backend
-      const response = await axios.post("http://localhost:5000/api/auth/register", {
+      const response = await axios.post("https://abhinasv-s-backend.onrender.com/api/auth/register", {
         firstName: data.name,
         lastName: data.lastname,
         email: data.email,

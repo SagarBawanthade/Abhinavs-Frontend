@@ -23,7 +23,7 @@ const ManageOrders = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/order/orders");
+        const response = await axios.get("https://abhinasv-s-backend.onrender.com/api/order/orders");
         setOrders(response.data);
         setLoading(false);
       } catch (err) {
@@ -54,7 +54,7 @@ const ManageOrders = () => {
   const handleDelete = async () => {
     if (selectedOrder) {
       try {
-        await axios.delete(`http://localhost:5000/api/order/delete-order/${selectedOrder._id}`);
+        await axios.delete(`https://abhinasv-s-backend.onrender.com/api/order/delete-order/${selectedOrder._id}`);
         setOrders(orders.filter(order => order._id !== selectedOrder._id)); // Remove deleted order from the list
         closeDialog();
         toast.success("Successfully Deleted Order"); // Close the dialog after deletion

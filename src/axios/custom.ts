@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const customFetch = axios.create({
-    baseURL: "http://localhost:5000",
+    baseURL: "https://abhinasv-s-backend.onrender.com/",
     headers: {
         Accept: "application/json"
     }

@@ -6,7 +6,7 @@ const OrderConfirmation2= () => {
   // Fetch order data from the backend (assuming an API call)
   useEffect(() => {
     // Example API call to fetch order details (replace with actual API endpoint)
-    fetch('http://localhost:5000/api/order/orders/')
+    fetch('https://abhinasv-s-backend.onrender.com/api/order/orders/')
       .then(response => response.json())
       .then(data => setOrder(data))
       .catch(error => console.error('Error fetching order details:', error));

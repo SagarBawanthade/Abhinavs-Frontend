@@ -18,7 +18,7 @@ const OrderDetails = () => {
 
     const fetchOrderDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/order/order/${orderId}`);
+        const response = await axios.get(`https://abhinasv-s-backend.onrender.com/api/order/order/${orderId}`);
         setOrder(response.data);
       } catch (error) {
         toast.error("Error fetching order details");
@@ -31,7 +31,7 @@ const OrderDetails = () => {
   const updateOrderStatus = async (newStatus) => {
     try {
       const response = await axios.patch(
-        `http://localhost:5000/api/order/update-status/${orderId}`,
+        `https://abhinasv-s-backend.onrender.com/api/order/update-status/${orderId}`,
         { status: newStatus }
       );
       setOrder((prevState) => ({ ...prevState, status: newStatus }));

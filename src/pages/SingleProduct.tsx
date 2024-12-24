@@ -39,7 +39,7 @@ const SingleProduct = () => {
   useEffect(() => {
     const fetchSingleProduct = async () => {
       const response = await fetch(
-        `http://localhost:5000/api/product/getproduct/${params.id}`
+        `https://abhinasv-s-backend.onrender.com/api/product/getproduct/${params.id}`
       );
       const data = await response.json();
       setSingleProduct(data);
@@ -47,7 +47,7 @@ const SingleProduct = () => {
     };
 
     const fetchProducts = async () => {
-      const response = await fetch("http://localhost:5000/api/product/getproducts");
+      const response = await fetch("https://abhinasv-s-backend.onrender.com/api/product/getproducts");
       const data = await response.json();
       setProducts(data);
     };
@@ -96,7 +96,7 @@ const SingleProduct = () => {
   
       try {
         // Send to backend (save to database)
-        const response = await fetch("http://localhost:5000/api/cart/add-to-cart", {
+        const response = await fetch("https://abhinasv-s-backend.onrender.com/api/cart/add-to-cart", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
