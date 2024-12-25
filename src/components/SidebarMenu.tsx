@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import { HiXMark } from "react-icons/hi2";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "../hooks";
-import { setLoginStatus, initializeLoginStatus } from "../features/auth/authSlice"; // Correct import
+import { setLoginStatus, initializeLoginStatus } from "../features/auth/authSlice";
 
 const SidebarMenu = ({
   isSidebarOpen,
@@ -16,16 +16,16 @@ const SidebarMenu = ({
   const dispatch = useAppDispatch();
   const { loginStatus } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
-  const [autoCloseTimeout, setAutoCloseTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [autoCloseTimeout, setAutoCloseTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    // On component mount, initialize login status from localStorage
     dispatch(initializeLoginStatus());
   }, [dispatch]);
 
   const logout = () => {
     toast.error("Logged out successfully");
-    dispatch(setLoginStatus({ loginStatus: false, user: null })); // Clear user and set loginStatus to false
+    localStorage.removeItem("user");
+    dispatch(setLoginStatus({ loginStatus: false, user: null })); // This is valid now
     setIsSidebarOpen(false);
     navigate("/login");
   };
@@ -33,29 +33,26 @@ const SidebarMenu = ({
   useEffect(() => {
     if (isSidebarOpen) {
       setIsAnimating(true);
-      // Start the auto-close timer
       const timer = setTimeout(() => {
         setIsSidebarOpen(false);
-      }, 1000); // Sidebar will auto-close after 5 seconds of inactivity
+      }, 2000);
       setAutoCloseTimeout(timer);
     } else {
-      // Clear the timeout if sidebar is closed manually
       if (autoCloseTimeout) {
         clearTimeout(autoCloseTimeout);
       }
-      const timer = setTimeout(() => setIsAnimating(false), 100);
+      const timer = setTimeout(() => setIsAnimating(false), 200);
       return () => clearTimeout(timer);
     }
   }, [isSidebarOpen, setIsSidebarOpen]);
 
   const handleInteraction = () => {
-    // Reset the auto-close timer on any interaction
     if (autoCloseTimeout) {
       clearTimeout(autoCloseTimeout);
     }
     const timer = setTimeout(() => {
       setIsSidebarOpen(false);
-    }, 1000);
+    }, 2000);
     setAutoCloseTimeout(timer);
   };
 
@@ -68,8 +65,8 @@ const SidebarMenu = ({
               ? "fixed top-0 left-0 w-64 z-50 h-full transition-transform duration-300 ease-in-out bg-white shadow-lg transform border-r border-black translate-x-0"
               : "fixed top-0 left-0 w-64 z-50 h-full transition-transform duration-300 ease-in-out bg-white shadow-lg transform border-r border-black -translate-x-full"
           }
-          onMouseMove={handleInteraction} // Reset timer on mouse movement
-          onClick={handleInteraction} // Reset timer on any click
+          onMouseMove={handleInteraction}
+          onClick={handleInteraction}
         >
           <div className="flex justify-end mr-1 mt-1">
             <HiXMark
@@ -109,17 +106,15 @@ const SidebarMenu = ({
               Search
             </Link>
             {loginStatus ? (
-              <>
-                <button
-                  onClick={() => {
-                    handleInteraction();
-                    logout();
-                  }}
-                  className="py-2 border-y border-secondaryBrown w-full block flex justify-center"
-                >
-                  Logout
-                </button>
-              </>
+              <button
+                onClick={() => {
+                  handleInteraction();
+                  logout();
+                }}
+                className="py-2 border-y border-secondaryBrown w-full block flex justify-center"
+              >
+                Logout
+              </button>
             ) : (
               <>
                 <Link

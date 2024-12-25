@@ -1,13 +1,25 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
+
+interface FormData {
+  name: string;
+  description: string;
+  category: string;
+  gender: string;
+  price: number;
+  stock: number;
+  size: string[];
+  color: string[];
+  images: string[];
+}
 
 const EditProduct = () => {
   const { productId } = useParams(); // Get the product ID from the URL params
   const navigate = useNavigate(); // To navigate programmatically after form submission
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: "",
     description: "",
     category: "Hoodies",
@@ -27,8 +39,10 @@ const EditProduct = () => {
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
-    console.log("Edit product clicked for", productId);
-        const response = await axios.get(`https://abhinasv-s-backend.onrender.com/api/product/getproduct/${productId}`);
+        console.log("Edit product clicked for", productId);
+        const response = await axios.get(
+          `https://abhinasv-s-backend.onrender.com/api/product/getproduct/${productId}`
+        );
         setFormData(response.data);
       } catch (err) {
         toast.error("Failed to fetch product details");
@@ -38,31 +52,38 @@ const EditProduct = () => {
     fetchProductDetails();
   }, [productId]);
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value, type, checked } = e.target as HTMLInputElement; // Explicitly casting to HTMLInputElement for checking `checked`
+  
     setFormData((prev) => {
       if (type === "checkbox") {
         const updatedArray = checked
-          ? [...prev[name], value]
-          : prev[name].filter((item) => item !== value);
+          ? [...(prev[name as keyof FormData] as string[]), value]
+          : (prev[name as keyof FormData] as string[]).filter((item) => item !== value);
+  
         return { ...prev, [name]: updatedArray };
       }
       return { ...prev, [name]: value };
     });
   };
+  
 
-  const handleImageUpload = async (e) => {
+  const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files.length) return;
+    if (!files?.length) return;
 
     setUploadingImage(true);
     try {
       const formData = new FormData();
       Array.from(files).forEach((file) => formData.append("images", file));
 
-      const response = await axios.post("https://abhinasv-s-backend.onrender.com/api/product/image-upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const response = await axios.post(
+        "https://abhinasv-s-backend.onrender.com/api/product/image-upload",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
 
       if (response.status === 200) {
         setFormData((prev) => ({
@@ -72,21 +93,20 @@ const EditProduct = () => {
         toast.success("Image Uploaded successfully");
       }
     } catch (err) {
-        toast.error("Failed to upload images.");
-     
+      toast.error("Failed to upload images.");
     } finally {
       setUploadingImage(false);
     }
   };
 
-  const handleImageDelete = (imageToDelete) => {
+  const handleImageDelete = (imageToDelete: string) => {
     setFormData((prev) => ({
       ...prev,
       images: prev.images.filter((image) => image !== imageToDelete),
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
@@ -102,8 +122,7 @@ const EditProduct = () => {
         navigate("/admin/products"); // Redirect to the products page
       }
     } catch (err) {
-        toast.error("Error updating product.");
-  
+      toast.error("Error updating product.");
     } finally {
       setLoading(false);
     }
@@ -112,10 +131,15 @@ const EditProduct = () => {
   return (
     <div className="container mx-auto p-8">
       <h2 className="text-3xl text-center mb-6">Edit Product</h2>
-      <form onSubmit={handleSubmit} className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+      <form
+        onSubmit={handleSubmit}
+        className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-lg"
+      >
         {/* Product Name */}
         <div>
-          <label htmlFor="name" className="block text-sm font-semibold">Product Name</label>
+          <label htmlFor="name" className="block text-sm font-semibold">
+            Product Name
+          </label>
           <input
             type="text"
             id="name"
@@ -129,7 +153,9 @@ const EditProduct = () => {
 
         {/* Product Description */}
         <div>
-          <label htmlFor="description" className="block text-sm font-semibold">Description</label>
+          <label htmlFor="description" className="block text-sm font-semibold">
+            Description
+          </label>
           <textarea
             id="description"
             name="description"
@@ -142,7 +168,9 @@ const EditProduct = () => {
 
         {/* Category */}
         <div>
-          <label htmlFor="category" className="block text-sm font-semibold">Category</label>
+          <label htmlFor="category" className="block text-sm font-semibold">
+            Category
+          </label>
           <select
             id="category"
             name="category"
@@ -159,7 +187,9 @@ const EditProduct = () => {
 
         {/* Price */}
         <div>
-          <label htmlFor="price" className="block text-sm font-semibold">Price (₹)</label>
+          <label htmlFor="price" className="block text-sm font-semibold">
+            Price (₹)
+          </label>
           <input
             type="number"
             id="price"
@@ -173,7 +203,9 @@ const EditProduct = () => {
 
         {/* Stock */}
         <div>
-          <label htmlFor="stock" className="block text-sm font-semibold">Stock Quantity</label>
+          <label htmlFor="stock" className="block text-sm font-semibold">
+            Stock Quantity
+          </label>
           <input
             type="number"
             id="stock"
@@ -226,7 +258,9 @@ const EditProduct = () => {
 
         {/* Images */}
         <div>
-          <label htmlFor="images" className="block text-sm font-semibold">Upload Images</label>
+          <label htmlFor="images" className="block text-sm font-semibold">
+            Upload Images
+          </label>
           <input
             type="file"
             id="images"

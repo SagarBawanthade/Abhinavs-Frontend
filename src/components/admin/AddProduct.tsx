@@ -1,9 +1,21 @@
-import { useState } from "react";
+import { useState, ChangeEvent, FormEvent } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 
+type FormData = {
+  name: string;
+  description: string;
+  category: string;
+  gender: string;
+  price: number;
+  stock: number;
+  size: string[]; // Explicitly define the type of size
+  color: string[]; // Explicitly define the type of color
+  images: string[]; // Explicitly define the type of images
+};
+
 const AddProduct = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: "",
     description: "",
     category: "Hoodies",
@@ -17,25 +29,30 @@ const AddProduct = () => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  console.log(error);
   const [uploadingImage, setUploadingImage] = useState(false);
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value, type, checked } = e.target as HTMLInputElement;
     setFormData((prevState) => {
       if (type === "checkbox") {
         const updatedArray = checked
-          ? [...prevState[name], value]
-          : prevState[name].filter((item) => item !== value);
+          ? Array.isArray(prevState[name as keyof FormData])
+            ? [...(prevState[name as keyof FormData] as string[]), value]
+            : [value] // In case it's not an array, start a new array with the value
+          : (prevState[name as keyof FormData] as string[]).filter((item: string) => item !== value);
+    
         return { ...prevState, [name]: updatedArray };
       } else {
         return { ...prevState, [name]: value };
       }
     });
+    
   };
 
-  const handleImageUpload = async (e) => {
-    const files = e.target.files; // Get multiple files
-    if (!files.length) return;
+  const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files?.length) return;
 
     setUploadingImage(true);
     try {
@@ -46,7 +63,6 @@ const AddProduct = () => {
         formData.append("images", file);
       });
 
-      // Send multiple files to backend for uploading to S3
       const response = await axios.post(
         "https://abhinasv-s-backend.onrender.com/api/product/image-upload",
         formData,
@@ -54,7 +70,6 @@ const AddProduct = () => {
       );
 
       if (response.status === 200) {
-        // Assuming response.data contains an array of image URLs
         setFormData((prevState) => ({
           ...prevState,
           images: [...prevState.images, ...response.data.imageUrls], // Add multiple image URLs
@@ -63,35 +78,31 @@ const AddProduct = () => {
       }
     } catch (err) {
       toast.error("Failed to upload images.");
-     
     } finally {
       setUploadingImage(false);
     }
   };
 
-  // Handle image removal
-  const handleImageDelete = (imageToDelete) => {
+  const handleImageDelete = (imageToDelete: string) => {
     setFormData((prevState) => ({
       ...prevState,
       images: prevState.images.filter((image) => image !== imageToDelete),
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
     try {
-      // Send the form data to backend
       const response = await axios.post(
         "https://abhinasv-s-backend.onrender.com/api/product/addproduct",
         formData
       );
 
       if (response.status === 201) {
-       toast.success("Product added successfully!");
-        // Reset form
+        toast.success("Product added successfully!");
         setFormData({
           name: "",
           description: "",
@@ -270,6 +281,7 @@ const AddProduct = () => {
               name="images"
               onChange={handleImageUpload}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg mt-2"
+              multiple
             />
             {uploadingImage && "Uploading..."}
             <div className="mt-2 flex space-x-2">
@@ -277,13 +289,13 @@ const AddProduct = () => {
                 <div key={index} className="relative">
                   <img
                     src={image}
-                    alt={`Uploaded Preview ${index + 1}`}
-                    className="w-20 h-20 object-cover border rounded-lg"
+                    alt={`Uploaded Preview ${index}`}
+                    className="w-20 h-20 object-cover rounded-md"
                   />
                   <button
                     type="button"
                     onClick={() => handleImageDelete(image)}
-                    className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full p-1"
+                    className="absolute top-0 right-0 bg-red-500 text-white rounded-full text-xs p-1"
                   >
                     X
                   </button>
@@ -292,17 +304,13 @@ const AddProduct = () => {
             </div>
           </div>
 
-          {/* Submit Button */}
-          <div className="mt-6">
-            <button
-              type="submit"
-              className="w-full bg-slate-900 text-white py-2 rounded-lg hover:bg-slate-600"
-              disabled={loading}
-            >
-              {loading ?  "Loading..." :  "Add Product"}
-            </button>
-          </div>
-          {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2 rounded-lg"
+            disabled={loading}
+          >
+            {loading ? "Adding Product..." : "Add Product"}
+          </button>
         </form>
       </div>
     </div>

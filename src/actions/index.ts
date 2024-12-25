@@ -27,5 +27,6 @@ export const checkoutAction = async ({request} : CheckoutFormAction) => {
   const formData = await request.formData();
   const data = Object.fromEntries(formData);
   const response = await customFetch.post("/orders", data);
+  console.log(response);
   return redirect('/');
 }

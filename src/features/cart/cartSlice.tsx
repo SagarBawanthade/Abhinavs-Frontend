@@ -2,15 +2,20 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 
 // Define the ProductInCart type
-type ProductInCart = {
+export type ProductInCart = {
   id: string;
+  _id: string; // Add this line
   size: string;
   color: string;
   quantity: number;
-  image: string;
-  title: string;
+  images: string;
+  name: string;
   price: number;
   stock: number;
+
+
+
+  
 };
 
 type CartState = {
@@ -19,7 +24,7 @@ type CartState = {
   userId: string;
 };
 
-const API_URL = "http://localhost:5000/api/cart/cart";
+const API_URL = "https://abhinasv-s-backend.onrender.com/api/cart/cart";
 
 // Fetch cart from the backend API
 const fetchCartFromAPI = async (userId: string): Promise<CartState> => {

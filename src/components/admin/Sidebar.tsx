@@ -1,6 +1,13 @@
+import React from "react";
 import { Link } from "react-router-dom";
 
-const Sidebar = ({ isVisible, toggleSidebar }) => {
+// Define the prop types
+interface SidebarProps {
+  isVisible: boolean;
+  toggleSidebar: () => void;  // Function that toggles the sidebar visibility
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ isVisible, toggleSidebar }) => {
   return (
     <div
       className={`${

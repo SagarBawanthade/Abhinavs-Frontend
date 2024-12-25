@@ -4,15 +4,47 @@ import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { FaCircle, FaCheckCircle, FaTruck, FaArrowLeft } from "react-icons/fa";
 
+interface Order {
+  status: string;
+  shippingInformation: {
+    firstName: string;
+    lastName: string;
+    address: string;
+    apartment: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
+  contactInformation: {
+    email: string;
+    phone: string;
+  };
+  orderSummary: {
+    items: {
+      productName: string;
+      productImage: string;
+      quantity: number;
+      size: string;
+      price: number;
+    }[];
+    total: number;
+  };
+  paymentInformation?: {
+    method: string;
+    nameOnCard: string;
+  };
+}
+
 const OrderDetails = () => {
-  const [order, setOrder] = useState(null);
+  const [order, setOrder] = useState<Order | null>(null);
   const navigate = useNavigate();
-  const { orderId } = useParams(); // Capture the orderId from the URL
+  const { orderId } = useParams();
 
   useEffect(() => {
     if (!orderId) {
       toast.error("Order not found");
-      navigate("/orders"); // Redirect to orders list if no orderId is found
+      navigate("/orders");
       return;
     }
 
@@ -26,26 +58,25 @@ const OrderDetails = () => {
     };
 
     fetchOrderDetails();
-  }, [orderId, navigate]); // Dependency array ensures the hook runs when orderId changes
+  }, [orderId, navigate]);
 
-  const updateOrderStatus = async (newStatus) => {
+  const updateOrderStatus = async (newStatus: string) => {
     try {
-      const response = await axios.patch(
+      await axios.patch(
         `https://abhinasv-s-backend.onrender.com/api/order/update-status/${orderId}`,
         { status: newStatus }
       );
-      setOrder((prevState) => ({ ...prevState, status: newStatus }));
+      setOrder((prevState) => prevState ? { ...prevState, status: newStatus } : null);
       toast.success("Order status updated successfully!");
     } catch (error) {
       toast.error("Error updating order status");
     }
   };
 
-  if (!order) return <div className="text-center py-20">Loading...</div>; // Show loading until the order is fetched
+  if (!order) return <div className="text-center py-20">Loading...</div>;
 
   return (
     <div className="max-w-screen-lg mx-auto pt-10 px-5">
-      {/* Top Section with Back Button and Order Title */}
       <div className="flex justify-between items-center mb-8">
         <button
           onClick={() => navigate("/admin/orders")}
@@ -57,34 +88,31 @@ const OrderDetails = () => {
         <h1 className="text-4xl font-bold text-gray-800">Order Details</h1>
       </div>
 
-      {/* Main Order Details Section */}
       <div className="bg-white shadow-lg rounded-lg p-8">
-        {/* Order Status at the Top */}
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-2xl font-semibold text-gray-800">Order Status</h3>
           <div className="flex items-center space-x-4">
-            {order.status === "Pending" ? (
+            {order?.status === "Pending" ? (
               <span className="text-red-500 flex items-center space-x-2">
                 <FaCircle size={24} />
                 <span>Pending</span>
               </span>
-            ) : order.status === "Delivered" ? (
+            ) : order?.status === "Delivered" ? (
               <span className="text-green-500 flex items-center space-x-2">
                 <FaCheckCircle size={24} />
                 <span>Delivered</span>
               </span>
-            ) : order.status === "In Transit" ? (
+            ) : order?.status === "In Transit" ? (
               <span className="text-yellow-500 flex items-center space-x-2">
                 <FaTruck size={24} />
                 <span>In Transit</span>
               </span>
             ) : (
-              <span className="text-gray-500">{order.status}</span>
+              <span className="text-gray-500">{order?.status}</span>
             )}
           </div>
         </div>
 
-        {/* Shipping Information */}
         <div className="border-b pb-6 mb-6">
           <h3 className="text-xl font-semibold text-gray-800 mb-2">Shipping Information</h3>
           <p>{order.shippingInformation.firstName} {order.shippingInformation.lastName}</p>
@@ -93,14 +121,12 @@ const OrderDetails = () => {
           <p>{order.shippingInformation.country}</p>
         </div>
 
-        {/* Contact Information */}
         <div className="border-b pb-6 mb-6">
           <h3 className="text-xl font-semibold text-gray-800 mb-2">Contact Information</h3>
           <p>Email: {order.contactInformation.email}</p>
           <p>Phone: {order.contactInformation.phone}</p>
         </div>
 
-        {/* Order Summary */}
         <div className="border-b pb-6 mb-6">
           <h3 className="text-xl font-semibold text-gray-800 mb-2">Order Summary</h3>
           {order.orderSummary.items.map((item, index) => (
@@ -121,10 +147,9 @@ const OrderDetails = () => {
           <h3 className="font-semibold mt-4 text-gray-800">Total: ₹ {order.orderSummary?.total || "Not Available"}</h3>
         </div>
 
-        {/* Payment Information */}
         <div className="border-b pb-6 mb-6">
           <h3 className="text-xl font-semibold text-gray-800 mb-2">Payment Information</h3>
-          {order.paymentInformation ? (
+          {order?.paymentInformation ? (
             <>
               <p>Method: {order.paymentInformation.method}</p>
               <p>Name on Card: {order.paymentInformation.nameOnCard}</p>
@@ -134,7 +159,6 @@ const OrderDetails = () => {
           )}
         </div>
 
-        {/* Status Update Buttons */}
         <div className="flex justify-around mb-8">
           <button
             onClick={() => updateOrderStatus("Pending")}

@@ -7,6 +7,10 @@ import { useSearchParams } from "react-router-dom";
 import { useState } from "react";
 
 const Search = () => {
+  const sortCriteria = "";
+  const category = "";
+  
+
   const [searchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState<number>(
     parseInt(searchParams.get("page") || "1")
@@ -26,7 +30,11 @@ const Search = () => {
 
       {/* Product Grid */}
       <div className="mt-12">
-        <ProductGridWrapper searchQuery={searchParams.get("query")!} page={currentPage}>
+        <ProductGridWrapper  searchQuery={searchParams.get("query")!} 
+        page={currentPage}
+        sortCriteria={sortCriteria} 
+        category={category}
+        limit={9} >
           <ProductGrid />
         </ProductGridWrapper>
       </div>

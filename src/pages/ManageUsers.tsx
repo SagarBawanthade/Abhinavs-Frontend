@@ -1,8 +1,18 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
+// Define the type for User
+interface User {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  createdAt: string;
+}
+
 const ManageProducts = () => {
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<User[]>([]); // Set the state type to User[]
   const [loading, setLoading] = useState(true);
 
   // Fetch users
@@ -12,7 +22,7 @@ const ManageProducts = () => {
         const response = await fetch("https://abhinasv-s-backend.onrender.com/api/auth/getusers");
         const data = await response.json();
         if (Array.isArray(data)) {
-          setUsers(data);
+          setUsers(data); // Now TypeScript knows that 'data' is an array of User objects
         } else {
           console.error("Response data is not an array:", data);
         }
@@ -27,15 +37,15 @@ const ManageProducts = () => {
   }, []);
 
   // Delete user
-  const deleteUser = async (id) => {
+  const deleteUser = async (id: string) => { // Specify 'id' as string
     try {
       const response = await fetch(`https://abhinasv-s-backend.onrender.com/api/auth/deleteuser/${id}`, {
         method: 'DELETE',
       });
 
       if (response.ok) {
-        setUsers(users.filter(user => user._id !== id)); 
-        toast.success("User Deleted Successfully");// Remove deleted user from state
+        setUsers(users.filter(user => user._id !== id)); // Now TypeScript knows 'user._id' exists
+        toast.success("User Deleted Successfully");
       } else {
         console.error("Failed to delete user:", response.statusText);
       }
@@ -45,7 +55,7 @@ const ManageProducts = () => {
   };
 
   // Format date (DD/MM/YYYY)
-  const formatDate = (date) => {
+  const formatDate = (date: string) => { // Specify 'date' as string
     const newDate = new Date(date);
     return `${newDate.getDate().toString().padStart(2, "0")}/${(newDate.getMonth() + 1)
       .toString()

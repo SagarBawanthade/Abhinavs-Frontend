@@ -1,6 +1,8 @@
 import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
-import Sidebar from "../components/admin/Sidebar";
+// import Sidebar from "../components/admin/Sidebar"
+
+
 import {
   FaUsers,
   FaTshirt,
@@ -9,8 +11,32 @@ import {
   FaCheckCircle,
 } from "react-icons/fa";
 
+// Define types for the dashboard data
+interface DashboardData {
+  users: number;
+  products: {
+    total: number;
+    hoodies: number;
+    tshirts: number;
+    oversizeTshirts: number;
+  };
+  orders: {
+    pending: number;
+    inTransit: number;
+    delivered: number;
+  };
+}
+
+interface Product {
+  category: string;
+}
+
+interface Order {
+  status: string;
+}
+
 const AdminDashboard = () => {
-  const [dashboardData, setDashboardData] = useState({
+  const [dashboardData, setDashboardData] = useState<DashboardData>({
     users: 0,
     products: {
       total: 0,
@@ -25,25 +51,6 @@ const AdminDashboard = () => {
     },
   });
 
-  // const [newOrder, setNewOrder] = useState(false); // Track new order status
-  // const [newOrderDetails, setNewOrderDetails] = useState(null); // Store new order details
-
-  // // Function to check for new orders
-  // const checkNewOrders = async () => {
-  //   try {
-  //     const response = await fetch("http://localhost:5000/api/order/watch-new-orders");
-  //     const data = await response.json();
-  //     console.log("New Order Data:", data);
-
-  //     if (data && data.newOrder) {
-  //       setNewOrder(true);
-  //       setNewOrderDetails(data.newOrder); // Store the new order details
-  //     }
-  //   } catch (error) {
-  //     console.error("Error checking for new orders:", error);
-  //   }
-  // };
-
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
@@ -54,8 +61,8 @@ const AdminDashboard = () => {
         ]);
 
         const usersData = await usersResponse.json();
-        const productsData = await productsResponse.json();
-        const ordersData = await ordersResponse.json();
+        const productsData: Product[] = await productsResponse.json();
+        const ordersData: Order[] = await ordersResponse.json();
 
         const hoodies = productsData.filter((product) => product.category === "Hoodies").length;
         const tshirts = productsData.filter((product) => product.category === "Tshirt").length;
@@ -87,23 +94,17 @@ const AdminDashboard = () => {
     };
 
     fetchDashboardData();
-    // Initial check for new orders
+  }, []); // Removed dependency to avoid unnecessary re-fetching
 
-   // Check every 10 seconds
-
-    
-  }, [dashboardData.orders.pending]); // Re-fetch when pending orders change
-
- 
   return (
     <div className="admin-dashboard flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <Sidebar />
+      {/* Sidebar
+      <Sidebar isVisible={isSidebarVisible} toggleSidebar={toggleSidebar} /> */}
 
       {/* Main Content */}
       <div className="flex-1 px-8 py-6 bg-white">
         <header className="mb-8">
-          <h1 className="text-4xl font-extrabold text-gray-800"> Dashboard</h1>
+          <h1 className="text-4xl font-extrabold text-gray-800">Dashboard</h1>
           <p className="text-sm text-gray-500">A quick overview of system metrics</p>
         </header>
 
@@ -166,8 +167,6 @@ const AdminDashboard = () => {
           ))}
         </div>
 
-      
-      
         <main>
           <Outlet />
         </main>
@@ -177,7 +176,14 @@ const AdminDashboard = () => {
 };
 
 // Reusable Metric Card Component
-const MetricCard = ({ icon, label, value, color }) => (
+interface MetricCardProps {
+  icon: JSX.Element;
+  label: string;
+  value: number;
+  color: string;
+}
+
+const MetricCard = ({ icon, label, value, color }: MetricCardProps) => (
   <div className="bg-white shadow rounded-lg p-6 flex items-center">
     <div className={`text-4xl text-${color}-500`}>{icon}</div>
     <div className="ml-4">

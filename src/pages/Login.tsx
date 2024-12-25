@@ -15,34 +15,36 @@ const Login = () => {
   // Handle login functionality
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+  
     // Get form data
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData);
-
+  
     // Check if form data is valid
     if (!checkLoginFormData(data)) return;
-
+  
     try {
       // Send login data to the backend
       const response = await axios.post("https://abhinasv-s-backend.onrender.com/api/auth/login", {
         email: data.email,
         password: data.password,
       });
-
+  
       if (response.status === 200) {
-        const { id, role } = response.data; // Assuming the server returns these fields
-
+        const { id, role, firstName } = response.data; // Assuming the server returns these fields
+  
         toast.success("You logged in successfully");
-
-        // Store user details in localStorage
-        const user = { loginStatus: true, role, id };
+  
+        // Store user details in localStorage, including firstName
+        const user = { loginStatus: true, role, id, firstName };
         localStorage.setItem("user", JSON.stringify(user));
-
+  
         // Dispatch the login status and role flag to Redux
-        dispatch(setLoginStatus(user));
-        dispatch(setUserId(user.id)); 
-
+        dispatch(setLoginStatus({ loginStatus: true, user }));
+  
+        // Set user ID for cart slice
+        dispatch(setUserId(user.id));
+  
         // Navigate to the user profile page
         navigate("/user-profile");
       } else {
@@ -53,6 +55,7 @@ const Login = () => {
       toast.error(errorMessage);
     }
   };
+  
 
   // Check if the user is already logged in when the page loads
   useEffect(() => {

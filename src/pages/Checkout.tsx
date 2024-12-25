@@ -1,3 +1,8 @@
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
 import { Button } from "../components";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { useNavigate } from "react-router-dom";
@@ -28,22 +33,33 @@ console.log(razorpayKeyId);
 
 
 const Checkout = () => {
+
+
   const { productsInCart = [], subtotal,userId  } = useAppSelector((state) => state.cart);
-  console.log("Cart Data in Checkout Page:", productsInCart, subtotal, userId);
+  console.log("ProductInCart:" , productsInCart)
+  
+  
+
+
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+
   const { user } = useAppSelector((state) => state.auth);  // Make sure you're selecting the user correctly
   const currentUserId = user?.id || userId;
+
+
+
   const handleCheckoutSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData);
   
     const checkoutData = {
-      data,
-      products: productsInCart,
+      data ,
+     
       subtotal,
     };
+    console.log(checkoutData);
   
     // Validate the checkout data
     if (!checkCheckoutFormData(checkoutData)) return;
@@ -94,7 +110,7 @@ const Checkout = () => {
       // Step 1: Create Razorpay order on the backend
       const razorpayOrder = await axios.post(
         "https://abhinasv-s-backend.onrender.com/api/order/create-razorpay-order",
-        { amount: (subtotal + 5 + subtotal * 0.05) * 100 } // Convert to paise
+        { amount: (subtotal + 2 + subtotal * 0.05) * 100 } // Convert to paise
       );
   
       const { orderId } = razorpayOrder.data;
@@ -116,7 +132,7 @@ const Checkout = () => {
         image: "https://abhinavs-storage-09.s3.ap-south-1.amazonaws.com/products/IMG_0823.JPG", 
         order_id: orderId,
         
-        handler: async (response) => {
+        handler: async (response:any) => {
           
           try {
             // Step 4: Verify payment
@@ -159,8 +175,13 @@ const Checkout = () => {
       // Step 6: Open Razorpay checkout
       const razorpay = new window.Razorpay(options);
       razorpay.open();
+
+
+razorpay.on("payment.failed", (response: { [key: string]: any }) => {
+
+
   
-      razorpay.on("payment.failed", (response) => {
+     
         console.error("Payment failed:", response);
         toast.error("Payment failed. Please try again.");
         navigate("/order-failed");
@@ -492,7 +513,7 @@ const Checkout = () => {
                       
                       <img
                         src={`${product?.images}`}
-                        alt={product?.title}
+                        alt={product?.name}
                         className="w-20 rounded-md"
                       />
                     </div>

@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import { updateProductQuantity, removeProductFromTheCart, setCartData, setUserId } from "../features/cart/cartSlice";
+import { updateProductQuantity, removeProductFromTheCart, setCartData } from "../features/cart/cartSlice";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { HiCheck as CheckIcon, HiXMark as XMarkIcon } from "react-icons/hi2";
@@ -10,13 +10,10 @@ const Cart = () => {
   const { productsInCart = [], subtotal, userId } = useSelector((state: any) => state.cart);
   console.log("Cart Data in Cart Page:", productsInCart, subtotal, userId);
 
-  
   const { user } = useSelector((state: any) => state.auth); // Assuming `user` contains user info
 
-  // Fetch userId from auth state, if available
   const currentUserId = user?.id || userId; // Fallback to Redux state if user is not logged in yet
 
-  // Fetch cart data from backend API
   useEffect(() => {
     if (currentUserId) {
       const fetchCartData = async () => {
@@ -24,7 +21,6 @@ const Cart = () => {
           const response = await fetch(`https://abhinasv-s-backend.onrender.com/api/cart/cart/${currentUserId}`);
           if (response.ok) {
             const data = await response.json();
-            // Dispatch only the necessary parts of the data
             dispatch(setCartData({
               productsInCart: data.cart.items.map((item: any) => ({
                 ...item.product,
@@ -38,7 +34,7 @@ const Cart = () => {
               userId: currentUserId,
             }));
           } else {
-            toast.error("Failed to load cart data.");
+            toast.error("Please Add items to cart to create your Cart. ");
           }
         } catch (error) {
           console.error("Error fetching cart data:", error);
@@ -49,9 +45,8 @@ const Cart = () => {
     }
   }, [dispatch, currentUserId]);
 
-  // Handle remove product
   const handleRemoveProduct = async (productId: string) => {
-    const updatedCart = productsInCart.filter((item) => item._id !== productId);
+    const updatedCart = productsInCart.filter((item: { _id: string }) => item._id !== productId);
     dispatch(removeProductFromTheCart({ id: productId }));
     localStorage.setItem(`cart_${currentUserId}`, JSON.stringify({ productsInCart: updatedCart, subtotal }));
 
@@ -89,11 +84,11 @@ const Cart = () => {
       if (response.ok) {
         dispatch(updateProductQuantity({ id: productId, quantity: newQuantity }));
 
-        const updatedCart = productsInCart.map((item) =>
+        const updatedCart = productsInCart.map((item: { _id: string; quantity: number; price: number }) =>
           item._id === productId ? { ...item, quantity: newQuantity } : item
         );
         const newSubtotal = updatedCart.reduce(
-          (acc, item) => acc + item.price * item.quantity,
+          (acc: number, item: { price: number; quantity: number }) => acc + item.price * item.quantity,
           0
         );
 
@@ -127,7 +122,7 @@ const Cart = () => {
                 <p className="text-lg text-gray-700">Your cart is empty</p>
               </div>
             ) : (
-              productsInCart.map((item) => (
+              productsInCart.map((item: { _id: string; images: string[]; name: string; price: number; quantity: number; stock: number; size: string | undefined }) => (
                 <li key={item._id} className="flex py-6 sm:py-10">
                   <div className="flex-shrink-0">
                     <img
@@ -145,8 +140,7 @@ const Cart = () => {
                           </Link>
                         </h3>
                         <p className="mt-1 text-sm font-medium text-gray-900">₹{item.price}</p>
-                        {/* Display Size */}
-                        <p className="mt-2 text-sm text-gray-600">Size: {item.size || "N/A"}</p> {/* Display size */}
+                        <p className="mt-2 text-sm text-gray-600">Size: {item.size || "N/A"}</p>
                       </div>
                       <div className="mt-4 sm:mt-0 sm:pr-9">
                         <label htmlFor={`quantity-${item._id}`}>Quantity:</label>

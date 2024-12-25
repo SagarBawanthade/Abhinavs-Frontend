@@ -1,7 +1,7 @@
-import { Link } from "react-router-dom";
+
 import { Button } from "../components";
 import { useState } from "react";
-import { FaPhoneAlt, FaEnvelope, FaMapMarkerAlt } from "react-icons/fa";
+
 
 const Contact = () => {
   const [isLoading, setIsLoading] = useState(false);

@@ -9,6 +9,11 @@ import { useAppSelector, useAppDispatch } from "../hooks";
 import { setUserData } from "../features/auth/authSlice";
 import axios from "axios";
 
+// Define the type for cart item
+interface CartItem {
+  product: string; // Assuming 'product' is a string, adjust according to your API response
+}
+
 const Header = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [cartItemCount, setCartItemCount] = useState(0);
@@ -25,8 +30,10 @@ const Header = () => {
           const fetchCartData = async () => {
             try {
               const cartResponse = await axios.get(`https://abhinasv-s-backend.onrender.com/api/cart/cart/${user.id}`);
-              const cartItems = cartResponse.data.cart.items || [];
-              const uniqueProducts = new Set(cartItems.map((item) => item.product));
+              const cartItems: CartItem[] = cartResponse.data.cart.items || []; // Type the cartItems array
+
+              // Ensure the item has a 'product' property of type 'string'
+              const uniqueProducts = new Set(cartItems.map((item: CartItem) => item.product));
               const uniqueItemCount = uniqueProducts.size;
               setCartItemCount(uniqueItemCount);
               console.log("Cart Item Count in Header:", uniqueItemCount);

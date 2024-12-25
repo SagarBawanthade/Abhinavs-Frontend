@@ -4,20 +4,33 @@ import { Link } from "react-router-dom";
 import { FaEye, FaEdit, FaTrashAlt, FaTruck, FaCheckCircle, FaHourglass } from "react-icons/fa"; // Import icons
 import toast from "react-hot-toast";
 
+// Define the types for Order and related fields
+interface Order {
+  _id: string;
+  status: "Delivered" | "In Transit" | "Pending"; // Can add more statuses if needed
+  shippingInformation: {
+    firstName: string;
+    lastName: string;
+  };
+  orderSummary: {
+    total: number;
+  };
+  orderDate: string; // Assuming this is a string
+}
+
 const statusIcons = {
-  "Delivered": <FaCheckCircle className="text-green-500" />,
+  Delivered: <FaCheckCircle className="text-green-500" />,
   "In Transit": <FaTruck className="text-yellow-500" />,
-  "Pending": <FaHourglass className="text-red-500" />,
-  // Add more statuses with corresponding icons if needed
+  Pending: <FaHourglass className="text-red-500" />,
 };
 
 const ManageOrders = () => {
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState<Order[]>([]); // Correct type for orders
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [selectedOrder, setSelectedOrder] = useState(null);  // Track selected order
-  const [isDialogOpen, setIsDialogOpen] = useState(false);  // Track if dialog is open
-  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false); // Track delete confirmation
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);  // Track selected order with proper type
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
   // Fetch orders on component mount
   useEffect(() => {
@@ -35,45 +48,46 @@ const ManageOrders = () => {
     fetchOrders();
   }, []);
 
-  const openDialog = (order) => {
+  // Explicitly type the parameter to avoid 'any' type
+  const openDialog = (order: Order) => {
     setSelectedOrder(order);
-    setIsDialogOpen(true);  // Open dialog when View is clicked
+    setIsDialogOpen(true); // Open dialog when View is clicked
   };
 
   const closeDialog = () => {
     setIsDialogOpen(false);
-    setSelectedOrder(null);  // Reset selected order
+    setSelectedOrder(null);
   };
 
   const handleEdit = () => {
-    // Logic for editing the order (e.g., update the order status or other details)
     console.log("Editing order:", selectedOrder);
-    // You can add API calls to save the updated details if necessary.
   };
 
+  // Add the proper type for 'selectedOrder'
   const handleDelete = async () => {
     if (selectedOrder) {
       try {
         await axios.delete(`https://abhinasv-s-backend.onrender.com/api/order/delete-order/${selectedOrder._id}`);
-        setOrders(orders.filter(order => order._id !== selectedOrder._id)); // Remove deleted order from the list
+        setOrders(orders.filter((order) => order._id !== selectedOrder._id)); // Remove deleted order from the list
         closeDialog();
-        toast.success("Successfully Deleted Order"); // Close the dialog after deletion
+        toast.success("Successfully Deleted Order");
       } catch (err) {
         setError("Failed to delete order");
-        toast.success("Failed to delete order")
+        toast.error("Failed to delete order");
       }
     }
-    setIsDeleteConfirmOpen(false); // Close the delete confirmation dialog
+    setIsDeleteConfirmOpen(false);
   };
 
-  const openDeleteConfirmation = (order) => {
+  // Explicitly type the parameter
+  const openDeleteConfirmation = (order: Order) => {
     setSelectedOrder(order);
     setIsDeleteConfirmOpen(true);
   };
 
   const closeDeleteConfirmation = () => {
     setIsDeleteConfirmOpen(false);
-    setSelectedOrder(null);  // Reset selected order
+    setSelectedOrder(null);
   };
 
   if (loading) return <p className="text-center text-gray-500">{"Loading.."}</p>;
@@ -102,7 +116,6 @@ const ManageOrders = () => {
                 <td className="py-4 px-6">{order._id}</td>
                 <td className="py-4 px-6">{order.shippingInformation.firstName}</td>
                 <td className="py-4 px-6 flex items-center space-x-2">
-                  {/* Display the corresponding icon for each order status */}
                   {statusIcons[order.status] || <FaHourglass className="text-gray-500" />}
                   <span>{order.status}</span>
                 </td>
@@ -114,7 +127,6 @@ const ManageOrders = () => {
                   <Link to={`/admin/orders/order-details/${order._id}`} className="text-blue-500 hover:text-blue-600">
                     <FaEye className="inline-block mr-2" /> View
                   </Link>
-                  {/* Remove the edit option after deletion */}
                   {selectedOrder && selectedOrder._id !== order._id && (
                     <button
                       onClick={() => openDialog(order)}
@@ -141,10 +153,7 @@ const ManageOrders = () => {
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-8 rounded-lg max-w-lg w-full">
             <h3 className="text-2xl font-semibold text-gray-800 mb-4">Order Details</h3>
-
-            {/* Displaying Order Details */}
             <div className="space-y-4">
-              {/* Editable fields */}
               <div>
                 <strong>Order ID:</strong>
                 <input
@@ -169,7 +178,6 @@ const ManageOrders = () => {
                   className="border rounded p-2 w-full"
                 />
               </div>
-              {/* More input fields for order details */}
             </div>
 
             <div className="mt-6 flex justify-end space-x-4">

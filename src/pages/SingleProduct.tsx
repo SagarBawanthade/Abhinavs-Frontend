@@ -12,12 +12,35 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { useSelector } from "react-redux";
 
+interface Product {
+  _id: string;
+  name: string;
+  category: string;
+  price: number;
+  stock: number;
+  images: string[];
+  description: string;
+  size: string[];
+  color: string[];
+  details: {
+    material: string;
+    careInstructions: string;
+    origin: string;
+    fabric: string;
+    neck: string;
+    sleeve: string;
+    styleCode: string;
+    occasion: string;
+    suitableFor: string;
+    shippingInfo: string;
+  };
+}
 
 const SingleProduct = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [singleProduct, setSingleProduct] = useState<Product | null>(null);
-  const [size, setSize] = useState<string>("S"); // Default size set to "S"
-  const [color, setColor] = useState<string>("Red"); // Default color set to "Red"
+  const [size, setSize] = useState<string>("S");
+  const [color, setColor] = useState<string>("Red");
   const [quantity, setQuantity] = useState<number>(1);
   const params = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
@@ -27,14 +50,6 @@ const SingleProduct = () => {
 
   const { user } = useSelector((state: any) => state.auth);
   const { productsInCart } = useSelector((state: any) => state.cart);
- 
-
-  // Function to get estimated delivery date
-  const getEstimatedDelivery = () => {
-    const currentDate = new Date();
-    currentDate.setDate(currentDate.getDate() + 5); // Add 5 days
-    return currentDate.toLocaleDateString(); // Return the formatted date
-  }
 
   useEffect(() => {
     const fetchSingleProduct = async () => {
@@ -43,7 +58,6 @@ const SingleProduct = () => {
       );
       const data = await response.json();
       setSingleProduct(data);
-      console.log(data); // Assuming the product data is in the first index
     };
 
     const fetchProducts = async () => {
@@ -55,77 +69,65 @@ const SingleProduct = () => {
     fetchProducts();
   }, [params.id]);
 
-  const handleAddToCart = async () => {
+  // Function to get estimated delivery date
+  const getEstimatedDelivery = () => {
+    const currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() + 5); // Add 5 days
+    return currentDate.toLocaleDateString(); // Return the formatted date
+  }
 
+  const handleAddToCart = async () => {
     if (!user) {
-      // If the user is not logged in, show a toast message
       toast.error("Please log in first to add products to your cart");
       return;
     }
-    if (singleProduct) {
 
-      // Ensure productsInCart is always an array
+    if (singleProduct) {
       const isProductInCart = Array.isArray(productsInCart) && productsInCart.some(
         (item) => item.id === singleProduct._id && item.size === size && item.color === color
       );
-  
+
       if (isProductInCart) {
         toast.error("Product with selected size and color is already in the cart");
         return;
       }
-  
-      // Check if the quantity exceeds stock
+
       if (quantity > singleProduct.stock) {
         toast.error("Not enough stock available");
         return;
       }
-  
-      // Create the cart product object with selected size, color, and quantity
+
       const cartProduct = {
         id: singleProduct._id,
-        size, // Selected size
-        color, // Selected color
+        _id: singleProduct._id,// Add this line
+        size,
+        color,
         quantity,
-        image: singleProduct.images[0], // First image as the main image
-        title: singleProduct.name,
+        images: singleProduct.images[0],
+        name: singleProduct.name,
         price: singleProduct.price,
         stock: singleProduct.stock,
       };
-  
-     
-  
+
       try {
-        // Send to backend (save to database)
         const response = await fetch("https://abhinasv-s-backend.onrender.com/api/cart/add-to-cart", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            userId: user.id, // Use logged-in user's ID
-            productId: singleProduct._id, // Product ID
+            userId: user.id,
+            productId: singleProduct._id,
             items: [
-              {
-                id: singleProduct._id,
-                size,
-                color,
-                quantity,
-                image: singleProduct.images[0], // First image
-                title: singleProduct.name,
-                price: singleProduct.price,
-                stock: singleProduct.stock,
-              }
+              cartProduct
             ],
           }),
         });
-  
+
         const data = await response.json();
-  
         if (response.ok) {
           toast.success("Product added to the cart");
-           // Add the product locally to the cart (Redux state update)
-      dispatch(addProductToTheCart(cartProduct));
-      console.log("Added Product:", cartProduct);
+          dispatch(addProductToTheCart(cartProduct));
         } else {
           toast.error(data.message || "Failed to add product to the cart");
         }
@@ -135,22 +137,16 @@ const SingleProduct = () => {
       }
     }
   };
-  
 
-  
-  
-
-  // Settings for React Slick (moved this definition here)
   const slickSettings = {
-    dots: true, // Show dots for navigation
-    infinite: true, // Infinite loop
-    speed: 500, // Transition speed
-    slidesToShow: 1, // Show one image at a time
-    slidesToScroll: 1, // Scroll one slide at a time
-    autoplay: true, // Autoplay the slider
-    autoplaySpeed: 3000, // Set delay for autoplay
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
   };
-  
 
   return (
     <div className="max-w-screen-2xl mx-auto px-5 max-[400px]:px-3">
@@ -272,7 +268,7 @@ const SingleProduct = () => {
               title={product.name}
               category={product.category}
               price={product.price}
-              stock={product.stock}
+              //stock={product.stock}
             />
           ))}
         </div>

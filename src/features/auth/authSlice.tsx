@@ -1,40 +1,50 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+// Define the type of the user
+type User = {
+  id: string;
+  role: string;
+  firstName: string;
+};
+
+// Define the AuthState
 type AuthState = {
   loginStatus: boolean;
-  user: { id: string; role: boolean; firstName?: string } | null; // Updated to include optional firstName
+  user: User | null;
+  firstName: string; // User can be null, but firstName is needed as a separate field
 };
 
 const initialState: AuthState = {
+  firstName: "", // Initialize with empty string
   loginStatus: false,
-  user: null,
+  user: null, // Initially null
 };
 
 export const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
+    // Set login status and user info
     setLoginStatus: (
       state,
-      action: PayloadAction<{ id: string; role: boolean; loginStatus: boolean; firstName?: string }>
+      action: PayloadAction<{ loginStatus: boolean; user: User | null }>
     ) => {
-      const { id, role, loginStatus, firstName } = action.payload;
-      console.log("Setting login status:", action.payload); // Debugging log
+      const { loginStatus, user } = action.payload;
+      console.log("Setting login status and user:", action.payload); // Debugging log
       state.loginStatus = loginStatus;
-      state.user = { id, role, firstName }; // Ensure role is set here
-      localStorage.setItem("user", JSON.stringify({ id, role, loginStatus, firstName }));
+
+      // If user is not null, update both user and firstName
+      if (user) {
+        state.user = user;
+        state.firstName = user.firstName; // Extract firstName from user object
+      } else {
+        state.user = null; // If user is null, reset the user and firstName
+        state.firstName = ""; // Reset firstName
+      }
+
+     
     },
-    
-    // setLoginStatus: (
-    //   state,
-    //   action: PayloadAction<{ id: string; role: boolean; loginStatus: boolean }>
-    // ) => {
-    //   const { id, role, loginStatus } = action.payload;
-    //   state.loginStatus = loginStatus;
-    //   state.user = { id, role };
-    //   localStorage.setItem("user", JSON.stringify({ id, role, loginStatus }));
-    // },
-    
+    // Set only the firstName in user data
     setUserData: (
       state,
       action: PayloadAction<{ firstName: string }>
@@ -45,16 +55,20 @@ export const authSlice = createSlice({
         localStorage.setItem("user", JSON.stringify({ ...userData, ...state.user }));
       }
     },
+    
+    // Initialize login status from localStorage
     initializeLoginStatus: (state) => {
-      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      const user = JSON.parse(localStorage.getItem("user") || "null");
       if (user?.loginStatus) {
         state.loginStatus = user.loginStatus;
-        state.user = { id: user.id, role: user.role || "user", firstName: user.firstName };
+        state.user = { id: user.id, role: user.role || false, firstName: user.firstName }; // Ensure role is handled if missing
       } else {
         state.loginStatus = false;
         state.user = null;
       }
     },
+    
+    // Logout and remove user data from state and localStorage
     logout: (state) => {
       state.loginStatus = false;
       state.user = null;

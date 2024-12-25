@@ -7,6 +7,16 @@ import { setLoginStatus } from "../features/auth/authSlice";
 import { store } from "../store";
 import axios from "axios";
 
+interface User {
+  id: string;
+  role: string; // Change role to string instead of boolean
+  loginStatus: boolean;
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+}
+
 const UserProfile = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);

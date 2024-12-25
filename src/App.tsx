@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux"; // Import useDispatch and useSelector
 import { initializeLoginStatus } from "./features/auth/authSlice"; // Import action to initialize login status
@@ -14,7 +14,7 @@ import {
   Register,
   Search,
   Shop,
-  SingleOrderHistory,
+  
   SingleProduct,
   UserProfile,
   AdminDashboard,
@@ -120,16 +120,7 @@ const router = createBrowserRouter([
         element: <OrderFailed />,
         loader: orderHistoryLoader,
       },
-      // {
-      //   path: "order-history/:id",
-      //   element: <SingleOrderHistory />,
-      //   loader: singleOrderLoader,
-      // },
-      // {
-      //   path: "order-confirmation/:id",
-      //   element: <SingleOrderHistory />,
-      //   loader: singleOrderLoader,
-      // },
+     
       {
         path: "reset-password",
         element: <ResetPassword />,

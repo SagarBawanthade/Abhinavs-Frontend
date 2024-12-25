@@ -3,11 +3,11 @@ import { Button } from "../components";
 import { checkRegisterFormData } from "../utils/checkRegisterFormData";
 import axios from "axios"; // Replace customFetch with axios
 import toast from "react-hot-toast";
-import { useState } from "react";
+
 
 const Register = () => {
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
+ 
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -23,7 +23,7 @@ const Register = () => {
       toast.error("Passwords do not match");
       return;
     }
-    setIsLoading(true); // Start spinner
+ 
 
     try {
       // Send registration data to the backend
@@ -43,8 +43,6 @@ const Register = () => {
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || "Server error. Please try again.";
       toast.error(errorMessage);
-    }finally {
-      setIsLoading(false); // Stop spinner
     }
   };
 
